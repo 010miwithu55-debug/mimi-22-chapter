@@ -7,6 +7,11 @@
     <title>Mimi's 22 Chapter — Room</title>
     <link rel="stylesheet" href="style.css" />
     <style>
+      :root {
+        --flame-top: 1%;
+        --flame-left: 46%;
+      }
+
       .room-screen {
         isolation: isolate;
       }
@@ -97,6 +102,166 @@
       .notebook-overlay.is-open {
         opacity: 1;
         visibility: visible;
+      }
+
+      .cake-overlay {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 32;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        overflow: hidden;
+        background: rgb(105 47 76 / 46%);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 240ms ease, visibility 240ms ease;
+      }
+
+      .cake-overlay.is-open {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .cake-celebration {
+        position: relative;
+        justify-self: center;
+        align-self: center;
+        width: min(90vw, 34rem);
+        margin: 0;
+        padding: clamp(1.5rem, 4vw, 2.7rem);
+        text-align: center;
+        background: #fff0f6;
+        border: 2px dashed #e79ab9;
+        border-radius: 24px 30px 22px 28px;
+        box-shadow: 8px 10px 0 rgb(120 46 80 / 18%);
+        transform-origin: center;
+        transform: scale(0.94) rotate(0.8deg);
+        transition: transform 280ms cubic-bezier(.2, .85, .25, 1.12);
+      }
+
+      .cake-overlay.is-open .cake-celebration { transform: scale(1) rotate(0.8deg); }
+
+      .cake-title {
+        margin: 0;
+        color: #ab4c77;
+        font: 800 clamp(1.8rem, 5vw, 3rem)/1 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+      }
+
+      .cake-subtitle {
+        margin: 0.45rem 0 1rem;
+        color: #a67087;
+        font: italic 0.95rem/1.4 Georgia, serif;
+      }
+
+      .cake-close {
+        position: absolute;
+        top: 0.8rem;
+        right: 0.9rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        color: #ba638b;
+        font: 700 1.25rem/1 sans-serif;
+        cursor: pointer;
+        background: #fff9fc;
+        border: 2px solid #e6a6c1;
+        border-radius: 50%;
+      }
+
+      .cake-stage {
+        position: relative;
+        width: min(72vw, 20rem);
+        margin: 0 auto;
+        cursor: pointer;
+      }
+
+      .cake-stage > img { display: block; width: 100%; height: auto; }
+
+      .cake-flame {
+        position: absolute;
+        top: var(--flame-top);
+        left: var(--flame-left);
+        width: 7%;
+        aspect-ratio: 0.62;
+        background: linear-gradient(#fff7a6, #ff9b62 65%, #f3708d);
+        border-radius: 60% 60% 65% 65%;
+        box-shadow: 0 0 15px #ffd77b;
+        transform-origin: 50% 100%;
+        animation: flame-flicker 700ms ease-in-out infinite alternate;
+      }
+
+      .cake-candle-mask {
+        position: absolute;
+        top: calc(var(--flame-top) - 1%);
+        left: calc(var(--flame-left) - 1.5%);
+        width: 10%;
+        height: 10%;
+        background: #fff0f6;
+        border-radius: 50% 50% 35% 35%;
+        opacity: 0;
+      }
+
+      .cake-smoke {
+        position: absolute;
+        top: var(--flame-top);
+        left: var(--flame-left);
+        width: 5%;
+        aspect-ratio: 1;
+        background: rgb(205 196 207 / 72%);
+        border-radius: 50%;
+        opacity: 0;
+      }
+
+      .cake-star {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        color: #f2b956;
+        font-size: clamp(1rem, 4vw, 1.8rem);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .cake-stage.is-blown .cake-flame { opacity: 0; animation: none; }
+      .cake-stage.is-blown .cake-candle-mask { opacity: 1; }
+      .cake-stage.is-blown .cake-smoke { animation: smoke-rise 950ms ease-out forwards; }
+      .cake-stage.is-blown .cake-star { animation: star-burst 800ms ease-out forwards; }
+      .cake-stage.is-blown .cake-star:nth-of-type(4) { animation-delay: 80ms; }
+      .cake-stage.is-blown .cake-star:nth-of-type(5) { animation-delay: 150ms; }
+
+      .cake-star--left { --x: -6rem; --y: -3rem; }
+      .cake-star--right { --x: 5rem; --y: -3.5rem; }
+      .cake-star--top { --x: 0.5rem; --y: -5rem; }
+
+      .cake-result {
+        margin: 0.5rem 0 0;
+        color: #bf5c88;
+        font: 800 clamp(1.05rem, 3.2vw, 1.55rem)/1.25 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+        transition: opacity 260ms ease, transform 260ms ease;
+      }
+
+      .cake-celebration.is-finished .cake-result { opacity: 1; transform: translateY(0) scale(1); }
+
+      @keyframes flame-flicker {
+        from { transform: rotate(-5deg) scale(0.92, 1.05); }
+        to { transform: rotate(5deg) scale(1.05, 0.93); }
+      }
+
+      @keyframes smoke-rise {
+        0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+        20% { opacity: 0.75; }
+        100% { opacity: 0; transform: translate(1rem, -4rem) scale(2.2); }
+      }
+
+      @keyframes star-burst {
+        0% { opacity: 0; transform: translate(0, 0) scale(0.4) rotate(0); }
+        30% { opacity: 1; }
+        100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1.15) rotate(100deg); }
       }
 
       .notebook-page {
@@ -522,7 +687,7 @@
         <img class="dog-open" src="assets/objects/dog-open.png" alt="" draggable="false" />
         <img class="dog-close" src="assets/objects/dog-close.png" alt="" draggable="false" />
       </div>
-      <img class="room-item cake" data-editable data-layout-key="cake" data-tooltip="一起吹灭蜡烛吧 🎂" src="assets/objects/cake.png" alt="Birthday cake" draggable="false" />
+      <img class="room-item cake" data-editable data-layout-key="cake" data-tooltip="一起吹灭蜡烛吧 🎂" src="assets/objects/cake.png" alt="Make a birthday wish" draggable="false" role="button" tabindex="0" />
       <img class="room-item notebook" id="notebook" data-editable data-layout-key="notebook" data-tooltip="谢谢你来到我的22岁💌" src="assets/objects/notebook.png" alt="Open Mimi's guestbook" draggable="false" role="button" tabindex="0" />
       <img class="room-item camera" data-editable data-layout-key="camera" data-tooltip="打开我的回忆铁盒 📷" src="assets/objects/camera.png" alt="Open Mimi's memory box" draggable="false" role="button" tabindex="0" />
     </main>
@@ -566,6 +731,23 @@
         </div>
       </div>
     </section>
+    <section class="cake-overlay" id="cake-overlay" aria-hidden="true" aria-labelledby="cake-title">
+      <div class="cake-celebration" id="cake-celebration" role="dialog" aria-modal="true" aria-labelledby="cake-title">
+        <button class="cake-close" id="cake-close" type="button" aria-label="Close birthday wish">×</button>
+        <h1 class="cake-title" id="cake-title">Make a wish ✨</h1>
+        <p class="cake-subtitle">close your eyes and make a wish</p>
+        <div class="cake-stage" id="cake-stage" role="button" tabindex="0" aria-label="Blow out the candle">
+          <img src="assets/objects/cake.png" alt="Birthday cake" />
+          <span class="cake-flame"></span>
+          <span class="cake-candle-mask"></span>
+          <span class="cake-smoke"></span>
+          <span class="cake-star cake-star--left">✦</span>
+          <span class="cake-star cake-star--right">✦</span>
+          <span class="cake-star cake-star--top">✦</span>
+        </div>
+        <p class="cake-result">Happy 22nd Birthday, Mimi! 🎉</p>
+      </div>
+    </section>
 
     <script>
       const roomStage = document.querySelector(".room-screen");
@@ -590,6 +772,11 @@
       const messageNext = document.querySelector("#message-next");
       const messagePageLabel = document.querySelector("#message-page");
       const messageSubmit = document.querySelector("#message-submit");
+      const cakeItem = document.querySelector(".cake");
+      const cakeOverlay = document.querySelector("#cake-overlay");
+      const cakeCelebration = document.querySelector("#cake-celebration");
+      const cakeClose = document.querySelector("#cake-close");
+      const cakeStage = document.querySelector("#cake-stage");
       const memoryWall = document.querySelector(".memory-wall");
       const memoryPhotos = [...document.querySelectorAll(".memory-photo")];
       const memoryStickers = document.querySelector("#memory-stickers");
@@ -803,6 +990,30 @@
         notebookItem.focus();
       }
 
+      function openCakeCelebration() {
+        if (editing) return;
+        hideHoverTooltip();
+        cakeStage.classList.remove("is-blown");
+        cakeCelebration.classList.remove("is-finished");
+        cakeOverlay.hidden = false;
+        cakeOverlay.setAttribute("aria-hidden", "false");
+        requestAnimationFrame(() => cakeOverlay.classList.add("is-open"));
+        cakeStage.focus();
+      }
+
+      function closeCakeCelebration() {
+        cakeOverlay.classList.remove("is-open");
+        cakeOverlay.setAttribute("aria-hidden", "true");
+        window.setTimeout(() => { cakeOverlay.hidden = true; }, 240);
+        cakeItem.focus();
+      }
+
+      function blowCakeCandle() {
+        if (cakeStage.classList.contains("is-blown")) return;
+        cakeStage.classList.add("is-blown");
+        window.setTimeout(() => cakeCelebration.classList.add("is-finished"), 700);
+      }
+
       function saveMessages() {
         localStorage.setItem(messageStorageKey, JSON.stringify(messages));
       }
@@ -1013,6 +1224,7 @@
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && memoryOverlay.classList.contains("is-open")) closeMemoryBox();
         if (event.key === "Escape" && notebookOverlay.classList.contains("is-open")) closeNotebook();
+        if (event.key === "Escape" && cakeOverlay.classList.contains("is-open")) closeCakeCelebration();
       });
 
       notebookItem.addEventListener("click", openNotebook);
@@ -1025,6 +1237,24 @@
       notebookClose.addEventListener("click", closeNotebook);
       notebookOverlay.addEventListener("click", (event) => {
         if (event.target === notebookOverlay) closeNotebook();
+      });
+      cakeItem.addEventListener("click", openCakeCelebration);
+      cakeItem.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openCakeCelebration();
+        }
+      });
+      cakeClose.addEventListener("click", closeCakeCelebration);
+      cakeOverlay.addEventListener("click", (event) => {
+        if (event.target === cakeOverlay) closeCakeCelebration();
+      });
+      cakeStage.addEventListener("click", blowCakeCandle);
+      cakeStage.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          blowCakeCandle();
+        }
       });
       messageForm.addEventListener("submit", (event) => {
         event.preventDefault();

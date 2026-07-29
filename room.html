@@ -768,7 +768,7 @@
         position: fixed;
         top: 2%;
         right: 2%;
-        z-index: 10;
+        z-index: 50;
         padding: 0.65em 0.9em;
         color: #8d4263;
         font: 700 0.95rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
@@ -834,7 +834,7 @@
         position: fixed;
         top: 2%;
         right: 12%;
-        z-index: 10;
+        z-index: 50;
         padding: 0.65em 0.9em;
         color: #8d4263;
         font: 700 0.95rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
@@ -1015,6 +1015,13 @@
       const memoryStickers = document.querySelector("#memory-stickers");
       const memoryPhotoNote = document.querySelector("#memory-photo-note");
       const layoutStorageKey = "mimi-22-room-layout";
+      const defaultRoomLayout = {
+        mimi: { left: 65.44, top: 36.89, width: 30.00, height: 60.92 },
+        dog: { left: 27.78, top: 53.55, width: 13.88, height: 20.09 },
+        cake: { left: 40.48, top: 65.98, width: 15.78, height: 25.68 },
+        notebook: { left: 9.35, top: 47.99, width: 7.12, height: 11.13 },
+        camera: { left: 9.52, top: 23.06, width: 7.95, height: 10.32 },
+      };
       const messageStorageKey = "mimi-22-notebook-messages";
       let editing = false;
       let dragState = null;
@@ -1568,6 +1575,13 @@
         isNormalized = true;
       }
 
+      function isValidLayout(layout) {
+        return roomItems.every((item) => {
+          const parameters = layout?.[item.dataset.layoutKey];
+          return parameters && [parameters.left, parameters.top, parameters.width].every(Number.isFinite);
+        });
+      }
+
       function showSavedLayout(layout) {
         const output = Object.fromEntries(Object.entries(layout).map(([name, parameters]) => [name, {
           left: `${parameters.left.toFixed(2)}%`,
@@ -1749,9 +1763,9 @@
       window.addEventListener("load", () => {
         try {
           const savedLayout = JSON.parse(localStorage.getItem(layoutStorageKey));
-          if (savedLayout) applyLayout(savedLayout);
+          applyLayout(isValidLayout(savedLayout) ? savedLayout : defaultRoomLayout);
         } catch {
-          localStorage.removeItem(layoutStorageKey);
+          applyLayout(defaultRoomLayout);
         }
         try {
           const savedMessages = JSON.parse(localStorage.getItem(messageStorageKey));

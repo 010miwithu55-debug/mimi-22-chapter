@@ -10,21 +10,62 @@
   <body>
     <main>
       <section class="screen welcome-screen" id="welcome-screen" aria-labelledby="welcome-title">
-        <div class="title-area" id="welcome-title" aria-label="Welcome to Mimi's 22 Chapter">
-          <p class="collage-line collage-line--small" aria-hidden="true">
-            <span>W</span><span>e</span><span>l</span><span>c</span><span>o</span><span>m</span><span>e</span>
-            <i>to</i>
+        <div class="cover-bubbles" aria-hidden="true">
+          <span class="cover-bubble cover-bubble--one"></span>
+          <span class="cover-bubble cover-bubble--two"></span>
+          <span class="cover-bubble cover-bubble--three"></span>
+          <span class="cover-bubble cover-bubble--four"></span>
+          <span class="cover-bubble cover-bubble--five"></span>
+        </div>
+        <div class="title-area" id="welcome-title" aria-label="WELCOME TO MIMI'S 22 CHAPTER">
+          <p class="title-line title-line--welcome" aria-hidden="true">
+            <span class="title-word title-word--welcome"><span class="title-letter" style="--letter-delay: .5s">W</span><span class="title-letter" style="--letter-delay: .54s">E</span><span class="title-letter" style="--letter-delay: .58s">L</span><span class="title-letter" style="--letter-delay: .62s">C</span><span class="title-letter" style="--letter-delay: .66s">O</span><span class="title-letter" style="--letter-delay: .70s">M</span><span class="title-letter" style="--letter-delay: .74s">E</span></span>
+            <span class="title-word title-word--to"><span class="title-letter" style="--letter-delay: .82s">T</span><span class="title-letter" style="--letter-delay: .86s">O</span></span>
           </p>
-          <p class="collage-line" aria-hidden="true">
-            <span>M</span><span>i</span><span>m</span><span>i</span><b>'s</b>
+          <p class="title-line title-line--mimi" aria-hidden="true">
+            <span class="title-word title-word--mimi"><span class="title-letter" style="--letter-delay: 1.3s">M</span><span class="title-letter" style="--letter-delay: 1.38s">I</span><span class="title-letter" style="--letter-delay: 1.46s">M</span><span class="title-letter" style="--letter-delay: 1.54s">I</span><span class="title-letter" style="--letter-delay: 1.62s">'</span><span class="title-letter" style="--letter-delay: 1.70s">S</span></span>
           </p>
-          <p class="collage-line collage-line--chapter" aria-hidden="true">
-            <em>22</em>
-            <span>C</span><span>h</span><span>a</span><span>p</span><span>t</span><span>e</span><span>r</span>
+          <p class="title-line title-line--chapter" aria-hidden="true">
+            <span class="title-word title-word--twenty-two"><span class="title-letter" style="--letter-delay: 2.1s">2</span><span class="title-letter" style="--letter-delay: 2.1s">2</span></span>
+            <span class="title-word title-word--chapter"><span class="title-letter" style="--letter-delay: 2.1s">C</span><span class="title-letter" style="--letter-delay: 2.1s">H</span><span class="title-letter" style="--letter-delay: 2.1s">A</span><span class="title-letter" style="--letter-delay: 2.1s">P</span><span class="title-letter" style="--letter-delay: 2.1s">T</span><span class="title-letter" style="--letter-delay: 2.1s">E</span><span class="title-letter" style="--letter-delay: 2.1s">R</span></span>
           </p>
         </div>
-        <a class="enter-button" href="room.html">Enter the room</a>
+        <a class="enter-button" id="enter-button" href="room.html">Open my chapter ♡</a>
       </section>
     </main>
+    <script>
+      const enterButton = document.querySelector("#enter-button");
+
+      if (window.matchMedia("(pointer: fine)").matches) {
+        const cursor = document.createElement("span");
+        const cursorShape = document.createElement("span");
+        cursor.className = "custom-cursor custom-cursor--bubble";
+        cursorShape.className = "custom-cursor__shape";
+        cursor.append(cursorShape);
+        document.body.append(cursor);
+        document.body.classList.add("has-custom-cursor");
+
+        document.addEventListener("pointermove", (event) => {
+          cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
+          cursor.classList.add("is-ready");
+        });
+        document.addEventListener("pointerdown", () => {
+          cursor.classList.remove("is-clicking");
+          void cursor.offsetWidth;
+          cursor.classList.add("is-clicking");
+        });
+        cursorShape.addEventListener("animationend", (event) => {
+          if (event.animationName === "cursor-pop") cursor.classList.remove("is-clicking");
+        });
+      }
+
+      window.setTimeout(() => {
+        enterButton.classList.add("is-visible");
+      }, 3050);
+
+      enterButton.addEventListener("click", () => {
+        sessionStorage.setItem("mimi-22-play-melody", "1");
+      });
+    </script>
   </body>
 </html>

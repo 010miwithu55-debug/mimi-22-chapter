@@ -10,6 +10,8 @@
       :root {
         --flame-top: 1%;
         --flame-left: 46%;
+        --bubble-opacity: 0.75;
+        --bubble-speed: 0.87;
       }
 
       .room-screen {
@@ -31,6 +33,145 @@
 
       .room-screen:not(.is-editing) .camera:hover { transform: rotate(-6deg) scale(1.07); }
       .room-screen:not(.is-editing) .notebook:hover { transform: rotate(7deg) scale(1.07); }
+
+      .birthday-bubble {
+        position: absolute;
+        z-index: 1;
+        width: var(--bubble-size);
+        aspect-ratio: 1;
+        bottom: -12%;
+        cursor: pointer;
+        opacity: var(--bubble-opacity);
+        pointer-events: none;
+        background: radial-gradient(circle at 32% 24%, rgb(255 255 255 / 92%) 0 7%, rgb(255 255 255 / 32%) 8% 18%, transparent 19%), var(--bubble-color);
+        border: 2px solid rgb(255 255 255 / 68%);
+        border-radius: 50% 48% 52% 49%;
+        box-shadow: inset -5px -7px 10px rgb(255 255 255 / 28%), inset 4px 5px 8px rgb(255 255 255 / 14%), 2px 4px 0 rgb(165 84 122 / 16%);
+        will-change: transform, opacity;
+        animation: bubble-rise var(--bubble-duration) linear var(--bubble-delay) forwards;
+      }
+
+      .birthday-bubble::after {
+        content: none;
+      }
+
+      .room-screen.is-editing .birthday-bubble {
+        pointer-events: none;
+        opacity: 0.3;
+      }
+
+      .birthday-bubble.is-popped {
+        pointer-events: none;
+        animation: none;
+      }
+
+      .bubble-confetti {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 9;
+        width: 0.4rem;
+        height: 0.58rem;
+        background: var(--paper-color);
+        border-radius: 2px 4px 2px 5px;
+        box-shadow: 1px 1px 0 rgb(125 67 90 / 13%);
+        pointer-events: none;
+        animation: bubble-confetti var(--particle-duration) cubic-bezier(.18, .78, .35, 1) forwards;
+      }
+
+      .bubble-confetti--ribbon {
+        width: 0.22rem;
+        height: 1.08rem;
+        border-radius: 999px 999px 4px 4px;
+      }
+
+      @keyframes bubble-rise {
+        0% { opacity: 0; transform: translate(0, 0) scale(0.78) rotate(-4deg); }
+        8% { opacity: var(--bubble-opacity); }
+        48% { opacity: var(--bubble-opacity); transform: translate(var(--bubble-drift-mid), -54svh) scale(var(--bubble-mid-scale)) rotate(4deg); }
+        88% { opacity: var(--bubble-opacity); }
+        100% { opacity: 0; transform: translate(var(--bubble-drift-end), -119svh) scale(0.94) rotate(-5deg); }
+      }
+
+      @keyframes bubble-pop {
+        from { opacity: 1; transform: scale(1); }
+        40% { opacity: 0.9; transform: scale(1.18); }
+        to { opacity: 0; transform: scale(0.12); }
+      }
+
+      @keyframes bubble-confetti {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35) rotate(0); }
+        12% { opacity: 1; transform: translate(calc(-50% + var(--burst-x-near)), calc(-50% + var(--burst-y-near))) scale(1) rotate(35deg); }
+        58% { opacity: 1; transform: translate(calc(-50% + var(--burst-x-mid)), calc(-50% + var(--burst-y-mid))) scale(1.05) rotate(var(--particle-spin-mid)); }
+        100% { opacity: 0; transform: translate(calc(-50% + var(--burst-x)), calc(-50% + var(--burst-y-end))) scale(0.72) rotate(var(--particle-spin)); }
+      }
+
+      .mimi.is-celebrating,
+      .dog.is-celebrating { animation: character-bounce 620ms cubic-bezier(.18, .9, .25, 1.22); }
+
+      .character-feedback {
+        position: fixed;
+        z-index: 26;
+        min-width: 5.6rem;
+        padding: 0.45rem 0.65rem;
+        color: #a34d76;
+        text-align: center;
+        pointer-events: none;
+        background: #fff6fa;
+        border: 2px dashed #e39ab7;
+        border-radius: 10px 13px 9px 12px;
+        box-shadow: 2px 3px 0 rgb(181 79 123 / 18%);
+        animation: character-feedback-float 1.8s cubic-bezier(.2, .75, .25, 1) forwards;
+      }
+
+      .character-feedback-main {
+        display: block;
+        font: 800 1rem/1 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+      }
+
+      .character-feedback-sub {
+        display: block;
+        margin-top: 0.22rem;
+        color: #b57890;
+        font: 700 0.68rem/1.2 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+      }
+
+      .feedback-particle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        color: var(--particle-color, #f3b85e);
+        font-size: 0.9rem;
+        line-height: 1;
+        opacity: 0;
+        animation: feedback-particle 1.25s ease-out var(--particle-delay, 120ms) forwards;
+      }
+
+      .feedback-particle--one { --particle-x: -2.3rem; --particle-y: -1.4rem; --particle-x-near: -1rem; --particle-y-near: -0.6rem; --particle-color: #f1ba5e; }
+      .feedback-particle--two { --particle-x: 2.1rem; --particle-y: -1.8rem; --particle-x-near: 0.9rem; --particle-y-near: -0.8rem; --particle-color: #ef8fae; }
+      .feedback-particle--three { --particle-x: -1.8rem; --particle-y: 1rem; --particle-x-near: -0.8rem; --particle-y-near: 0.45rem; --particle-color: #ef8fae; --particle-delay: 180ms; }
+      .feedback-particle--four { --particle-x: 2.2rem; --particle-y: 0.8rem; --particle-x-near: 1rem; --particle-y-near: 0.35rem; --particle-color: #f1ba5e; --particle-delay: 220ms; }
+
+      @keyframes character-bounce {
+        0%, 100% { transform: translateY(0) scale(1); }
+        35% { transform: translateY(-7px) scale(1.1, 0.94); }
+        58% { transform: translateY(1px) scale(0.96, 1.05); }
+        78% { transform: translateY(-2px) scale(1.03, 0.98); }
+      }
+
+      @keyframes character-feedback-float {
+        0% { opacity: 0; transform: translate(-50%, 9px) scale(0.55) rotate(-3deg); }
+        20% { opacity: 1; transform: translate(-50%, 0) scale(1.06) rotate(1deg); }
+        38% { opacity: 1; transform: translate(-50%, -2px) scale(1) rotate(-1deg); }
+        64% { opacity: 1; transform: translate(-50%, -1.8rem) scale(1) rotate(1deg); }
+        100% { opacity: 0; transform: translate(-50%, -4.8rem) scale(0.94) rotate(2deg); }
+      }
+
+      @keyframes feedback-particle {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0); }
+        22% { opacity: 1; transform: translate(calc(-50% + var(--particle-x-near)), calc(-50% + var(--particle-y-near))) scale(1) rotate(25deg); }
+        100% { opacity: 0; transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y))) scale(0.75) rotate(80deg); }
+      }
 
       .hover-tooltip {
         position: fixed;
@@ -92,7 +233,7 @@
         display: grid;
         place-items: center;
         padding: 1rem;
-        overflow: hidden;
+        overflow: visible;
         background: rgb(105 47 76 / 42%);
         opacity: 0;
         visibility: hidden;
@@ -266,8 +407,9 @@
 
       .notebook-page {
         position: relative;
-        width: min(82vw, 42rem);
-        height: min(82svh, 42rem);
+        --note-paper-width: min(100%, 56.2svh, 31.85rem);
+        width: min(75vw, 68rem);
+        height: min(85svh, 48rem);
         padding: clamp(2.5rem, 7vw, 4.5rem) clamp(1.4rem, 6vw, 4rem) 1.5rem;
         text-align: center;
         background: url("assets/backgrounds/melody-paper.png") center / contain no-repeat;
@@ -275,24 +417,37 @@
         transition: transform 300ms cubic-bezier(.2, .85, .25, 1.12);
       }
 
+      .note-board { position: relative; }
+
       .notebook-overlay.is-open .notebook-page { transform: scale(1) rotate(-1deg); }
 
       .notebook-title {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        width: var(--note-paper-width);
         margin: 0;
         color: #c66f9c;
         font: 800 clamp(1.35rem, 3.5vw, 2.15rem)/1.1 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        transform: translateX(-50%);
       }
 
       .notebook-subtitle {
-        margin: 0.35rem 0 1rem;
+        position: absolute;
+        top: 18%;
+        left: 50%;
+        width: var(--note-paper-width);
+        margin: 0;
         color: #aa7892;
         font: italic 0.95rem/1.4 Georgia, serif;
+        transform: translateX(-50%);
       }
 
       .notebook-close {
-        position: absolute;
-        top: 1.2rem;
-        right: 1rem;
+        position: fixed;
+        top: 1.25rem;
+        right: 1.5rem;
+        z-index: 9999;
         width: 2.2rem;
         height: 2.2rem;
         color: #bc668e;
@@ -305,10 +460,14 @@
       }
 
       .message-form {
+        position: absolute;
+        top: 25%;
+        left: 50%;
         display: grid;
         gap: 0.55rem;
-        width: min(100%, 28rem);
-        margin: 0 auto;
+        width: min(var(--note-paper-width), 28rem);
+        margin: 0;
+        transform: translateX(-50%);
       }
 
       .message-form input,
@@ -340,10 +499,14 @@
       }
 
       .message-cards {
-        position: relative;
+        position: absolute;
+        top: 49%;
+        left: 50%;
+        width: var(--note-paper-width);
         height: clamp(10rem, 30vh, 15rem);
-        margin-top: 0.6rem;
+        margin: 0;
         overflow: hidden;
+        transform: translateX(-50%);
       }
 
       .message-card {
@@ -409,13 +572,17 @@
       }
 
       .message-pagination {
+        position: absolute;
+        bottom: 7%;
+        left: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.65rem;
-        margin-top: 0.25rem;
+        margin: 0;
         color: #bd668d;
         font: 700 0.7rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        transform: translateX(-50%);
       }
 
       .message-pagination button {
@@ -547,6 +714,11 @@
 
       @media (max-width: 650px) {
         .memory-box { height: min(92svh, calc(100svh - 2rem), 48rem); padding: 1rem; }
+        .notebook-page {
+          --note-paper-width: min(100%, 58.4svh, 31.85rem);
+          width: min(92vw, 68rem);
+          height: min(88svh, 48rem);
+        }
         .memory-title { padding-inline: 2rem; }
         .memory-subtitle { margin-bottom: 0.6rem; }
       }
@@ -605,6 +777,57 @@
         border-radius: 8px 11px 7px 10px;
         box-shadow: 2px 3px 0 rgb(163 74 112 / 22%);
         cursor: pointer;
+      }
+
+      .music-corner {
+        position: fixed;
+        top: 2%;
+        right: 2%;
+        z-index: 11;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .music-sticker {
+        width: 2.35rem;
+        height: 2.35rem;
+        object-fit: contain;
+        transform: rotate(-9deg);
+        filter: drop-shadow(2px 3px 1px rgb(98 106 169 / 18%));
+        pointer-events: none;
+      }
+
+      .music-button {
+        padding: 0.64rem 0.9rem;
+        color: #78619f;
+        font: 700 0.95rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        cursor: pointer;
+        background: #f5efff;
+        border: 2px dashed #a89ad1;
+        border-radius: 8px 12px 7px 10px;
+        box-shadow: 3px 4px 0 rgb(112 97 162 / 18%);
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .music-button:hover,
+      .music-button:focus-visible { transform: rotate(-1deg) scale(1.04); }
+      .music-button:active { transform: rotate(-1deg) scale(0.96); box-shadow: 1px 2px 0 rgb(112 97 162 / 18%); }
+
+      .music-floating-note {
+        position: fixed;
+        z-index: 24;
+        color: #8f79c2;
+        font: 800 1.15rem/1 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        pointer-events: none;
+        text-shadow: 1px 1px 0 rgb(255 255 255 / 75%);
+        animation: music-note-float 2s ease-out forwards;
+      }
+
+      @keyframes music-note-float {
+        0% { opacity: 0; transform: translate(-50%, 6px) scale(0.65) rotate(-8deg); }
+        18% { opacity: 1; }
+        100% { opacity: 0; transform: translate(calc(-50% + var(--note-drift)), -3.8rem) scale(1.05) rotate(10deg); }
       }
 
       .save-layout {
@@ -679,11 +902,11 @@
   </head>
   <body>
     <main class="screen room-screen" aria-label="Mimi's birthday room">
-      <div class="room-item mimi mimi-character" data-editable data-layout-key="mimi" data-tooltip="今天是特别的日子🥳🎉" aria-label="Mimi">
+      <div class="room-item mimi mimi-character" data-editable data-layout-key="mimi" data-tooltip="今天是特别的日子🥳🎉" aria-label="Mimi" role="button" tabindex="0">
         <img class="mimi-open" src="assets/characters/mimi-open.png" alt="" draggable="false" />
         <img class="mimi-close" src="assets/characters/mimi-close.png" alt="" draggable="false" />
       </div>
-      <div class="room-item dog dog-character" data-editable data-layout-key="dog" data-tooltip="汪汪！🐶" aria-label="A small dog">
+      <div class="room-item dog dog-character" data-editable data-layout-key="dog" data-tooltip="汪汪！🐶" aria-label="A small dog" role="button" tabindex="0">
         <img class="dog-open" src="assets/objects/dog-open.png" alt="" draggable="false" />
         <img class="dog-close" src="assets/objects/dog-close.png" alt="" draggable="false" />
       </div>
@@ -691,8 +914,13 @@
       <img class="room-item notebook" id="notebook" data-editable data-layout-key="notebook" data-tooltip="谢谢你来到我的22岁💌" src="assets/objects/notebook.png" alt="Open Mimi's guestbook" draggable="false" role="button" tabindex="0" />
       <img class="room-item camera" data-editable data-layout-key="camera" data-tooltip="打开我的回忆铁盒 📷" src="assets/objects/camera.png" alt="Open Mimi's memory box" draggable="false" role="button" tabindex="0" />
     </main>
-    <button class="edit-toggle" id="edit-toggle" type="button" aria-pressed="false">Edit room</button>
-    <button class="save-layout" id="save-layout" type="button">Save layout</button>
+    <button class="edit-toggle" id="edit-toggle" type="button" aria-pressed="false" hidden>Edit room</button>
+    <button class="save-layout" id="save-layout" type="button" hidden>Save layout</button>
+    <div class="music-corner" id="music-corner">
+      <img class="music-sticker" src="assets/stickers/music-note-blue.png" alt="" />
+      <button class="music-button" id="music-button" type="button">♪ Mimi's melody</button>
+    </div>
+    <audio id="birthday-melody" src="assets/music/birthday.mp3" loop preload="auto"></audio>
     <aside class="editor-readout" id="editor-readout" hidden aria-live="polite"></aside>
     <aside class="hover-tooltip" id="hover-tooltip" role="status" aria-live="polite"></aside>
     <div class="camera-flash" id="camera-flash" aria-hidden="true"></div>
@@ -714,7 +942,7 @@
       </div>
     </section>
     <section class="notebook-overlay" id="notebook-overlay" aria-hidden="true" aria-labelledby="notebook-title">
-      <div class="notebook-page" role="dialog" aria-modal="true" aria-labelledby="notebook-title">
+      <div class="notebook-page note-board" role="dialog" aria-modal="true" aria-labelledby="notebook-title">
         <button class="notebook-close" id="notebook-close" type="button" aria-label="Close guestbook">×</button>
         <h1 class="notebook-title" id="notebook-title">谢谢你来到我的22岁 💌</h1>
         <p class="notebook-subtitle">leave a little note for me</p>
@@ -772,11 +1000,16 @@
       const messageNext = document.querySelector("#message-next");
       const messagePageLabel = document.querySelector("#message-page");
       const messageSubmit = document.querySelector("#message-submit");
+      const musicCorner = document.querySelector("#music-corner");
+      const musicButton = document.querySelector("#music-button");
+      const birthdayMelody = document.querySelector("#birthday-melody");
       const cakeItem = document.querySelector(".cake");
       const cakeOverlay = document.querySelector("#cake-overlay");
       const cakeCelebration = document.querySelector("#cake-celebration");
       const cakeClose = document.querySelector("#cake-close");
       const cakeStage = document.querySelector("#cake-stage");
+      const mimiItem = document.querySelector(".mimi-character");
+      const dogItem = document.querySelector(".dog-character");
       const memoryWall = document.querySelector(".memory-wall");
       const memoryPhotos = [...document.querySelectorAll(".memory-photo")];
       const memoryStickers = document.querySelector("#memory-stickers");
@@ -789,6 +1022,46 @@
       let messages = [];
       let messagePage = 0;
       let editingMessageIndex = null;
+      let musicNoteTimer = null;
+      let musicPausedByUser = false;
+      let shouldStartMusic = false;
+
+      let setRoomCursorType = () => {};
+      if (window.matchMedia("(pointer: fine)").matches) {
+        const cursor = document.createElement("span");
+        const cursorShape = document.createElement("span");
+        cursor.className = "custom-cursor custom-cursor--sparkle";
+        cursorShape.className = "custom-cursor__shape";
+        cursor.append(cursorShape);
+        document.body.append(cursor);
+        document.body.classList.add("has-custom-cursor");
+
+        setRoomCursorType = (type) => {
+          cursor.classList.toggle("custom-cursor--sparkle", type === "sparkle");
+          cursor.classList.toggle("custom-cursor--heart", type === "heart");
+          cursorShape.textContent = type === "heart" ? "♥" : "";
+        };
+
+        document.addEventListener("pointermove", (event) => {
+          cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
+          cursor.classList.add("is-ready");
+        });
+        document.addEventListener("pointerdown", () => {
+          cursor.classList.remove("is-clicking");
+          void cursor.offsetWidth;
+          cursor.classList.add("is-clicking");
+        });
+        cursorShape.addEventListener("animationend", (event) => {
+          if (event.animationName === "cursor-pop") cursor.classList.remove("is-clicking");
+        });
+      }
+
+      try {
+        shouldStartMusic = sessionStorage.getItem("mimi-22-play-melody") === "1";
+        sessionStorage.removeItem("mimi-22-play-melody");
+      } catch {
+        shouldStartMusic = false;
+      }
 
       const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
       const usesLayoutMetrics = (item) => item.classList.contains("camera") || item.classList.contains("notebook");
@@ -808,6 +1081,17 @@
         }
         return shuffledItems;
       };
+      const bubbleLanes = [3, 12, 21, 30, 39, 48, 57, 66, 75, 84, 93];
+      const bubbleColors = [
+        "rgb(255 142 187 / 82%)",
+        "rgb(126 194 250 / 82%)",
+        "rgb(255 213 92 / 84%)",
+        "rgb(181 146 238 / 82%)",
+        "rgb(126 211 153 / 82%)",
+      ];
+      const paperColors = ["#ff9ebd", "#a8d7ff", "#ffe082", "#c9b3ed", "#a9ddbc"];
+      const bubbleSpeed = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bubble-speed")) || 0.85;
+      const targetBubbleCount = Math.floor(randomBetween(8, 13));
       const photoZones = [
         { left: 3, top: 5, width: 27, height: 41 },
         { left: 35, top: 3, width: 28, height: 43 },
@@ -822,6 +1106,89 @@
         ["assets/stickers/bow-blue.PNG", 2],
         ["assets/stickers/clover-green.PNG", 2],
       ];
+
+      function popBirthdayBubble(bubble) {
+        if (editing || bubble.classList.contains("is-popped")) return;
+        const bubbleRect = bubble.getBoundingClientRect();
+        const stageRect = roomStage.getBoundingClientRect();
+        const currentTransform = getComputedStyle(bubble).transform;
+        const popTransform = currentTransform === "none" ? "" : currentTransform;
+        bubble.style.animation = "none";
+        bubble.style.transform = currentTransform;
+        bubble.classList.add("is-popped");
+        bubble.animate([
+          { opacity: 1, transform: popTransform },
+          { opacity: 0.9, transform: `${popTransform} scale(1.18)` },
+          { opacity: 0, transform: `${popTransform} scale(0.12)` },
+        ], {
+          duration: 260,
+          easing: "cubic-bezier(.2, .75, .3, 1)",
+          fill: "forwards",
+        });
+        for (let index = 0; index < 16; index += 1) {
+          const particle = document.createElement("span");
+          const angle = (Math.PI * 2 * index) / 12 + randomBetween(-0.16, 0.16);
+          const distance = randomBetween(2.2, 4.4);
+          const burstX = Math.cos(angle) * distance;
+          const burstY = Math.sin(angle) * distance;
+          particle.className = "bubble-confetti";
+          if (index % 3 === 0) particle.classList.add("bubble-confetti--ribbon");
+          particle.style.setProperty("--paper-color", paperColors[Math.floor(Math.random() * paperColors.length)]);
+          particle.style.setProperty("--burst-x-near", `${burstX * 0.25}rem`);
+          particle.style.setProperty("--burst-y-near", `${burstY * 0.25}rem`);
+          particle.style.setProperty("--burst-x-mid", `${burstX * 0.78}rem`);
+          particle.style.setProperty("--burst-y-mid", `${burstY * 0.78}rem`);
+          particle.style.setProperty("--burst-x", `${burstX}rem`);
+          particle.style.setProperty("--burst-y-end", `${burstY + randomBetween(1.8, 3.2)}rem`);
+          particle.style.setProperty("--particle-spin-mid", `${randomBetween(100, 280)}deg`);
+          particle.style.setProperty("--particle-spin", `${randomBetween(320, 720)}deg`);
+          particle.style.setProperty("--particle-duration", `${randomBetween(850, 1150)}ms`);
+          particle.style.left = `${bubbleRect.left - stageRect.left + bubbleRect.width / 2}px`;
+          particle.style.top = `${bubbleRect.top - stageRect.top + bubbleRect.height / 2}px`;
+          particle.addEventListener("animationend", () => particle.remove());
+          roomStage.append(particle);
+        }
+        window.setTimeout(() => {
+          bubble.remove();
+        }, 1050);
+      }
+
+      function createBirthdayBubble() {
+        const bubble = document.createElement("div");
+        bubble.className = "birthday-bubble";
+        bubble.style.left = `${bubbleLanes[Math.floor(Math.random() * bubbleLanes.length)] + randomBetween(-2, 2)}%`;
+        bubble.style.setProperty("--bubble-size", `${randomBetween(3.6, 7.2)}%`);
+        bubble.style.setProperty("--bubble-color", bubbleColors[Math.floor(Math.random() * bubbleColors.length)]);
+        bubble.style.setProperty("--bubble-drift-mid", `${randomBetween(-2.5, 2.5)}rem`);
+        bubble.style.setProperty("--bubble-drift-end", `${randomBetween(-4, 4)}rem`);
+        bubble.style.setProperty("--bubble-mid-scale", randomBetween(0.92, 1.08));
+        bubble.style.setProperty("--bubble-duration", `${randomBetween(13, 20) / bubbleSpeed}s`);
+        bubble.style.setProperty("--bubble-delay", "0s");
+        bubble.addEventListener("animationend", (event) => {
+          if (event.target !== bubble || event.animationName !== "bubble-rise") return;
+          bubble.remove();
+        });
+        roomStage.append(bubble);
+      }
+
+      function startBirthdayBubbles() {
+        createBirthdayBubble();
+        window.setInterval(() => {
+          if (roomStage.querySelectorAll(".birthday-bubble").length < targetBubbleCount) createBirthdayBubble();
+        }, 900);
+      }
+
+      roomStage.addEventListener("click", (event) => {
+        if (editing || event.target !== roomStage) return;
+        const bubble = [...roomStage.querySelectorAll(".birthday-bubble")]
+          .reverse()
+          .find((candidate) => {
+            const rect = candidate.getBoundingClientRect();
+            return event.clientX >= rect.left && event.clientX <= rect.right
+              && event.clientY >= rect.top && event.clientY <= rect.bottom;
+          });
+        if (bubble) popBirthdayBubble(bubble);
+      });
       const stickerAnchors = [
         { left: 1, top: 2 }, { left: 31, top: 2 }, { left: 65, top: 2 }, { left: 95, top: 3 },
         { left: 1, top: 48 }, { left: 33, top: 48 }, { left: 65, top: 48 }, { left: 95, top: 48 },
@@ -894,6 +1261,7 @@
       }
 
       createMemoryStickers();
+      startBirthdayBubbles();
 
       function showMemoryPhotoNote(photo) {
         const wallRect = memoryWall.getBoundingClientRect();
@@ -939,6 +1307,52 @@
 
       scheduleDogBlink();
 
+      function spawnMusicNote() {
+        const cornerRect = musicCorner.getBoundingClientRect();
+        const note = document.createElement("span");
+        note.className = "music-floating-note";
+        note.textContent = Math.random() > 0.5 ? "♪" : "♫";
+        note.style.left = `${cornerRect.left + cornerRect.width * randomBetween(0.2, 0.8)}px`;
+        note.style.top = `${cornerRect.top + cornerRect.height * 0.35}px`;
+        note.style.setProperty("--note-drift", `${randomBetween(-1.2, 1.2)}rem`);
+        note.addEventListener("animationend", () => note.remove());
+        document.body.append(note);
+      }
+
+      function updateMusicState(state) {
+        musicButton.textContent = state === "playing" ? "♪ playing..." : state === "paused" ? "♪ paused" : "♪ Mimi's melody";
+      }
+
+      birthdayMelody.addEventListener("play", () => {
+        musicPausedByUser = false;
+        updateMusicState("playing");
+        if (musicNoteTimer) window.clearInterval(musicNoteTimer);
+        spawnMusicNote();
+        musicNoteTimer = window.setInterval(spawnMusicNote, 1300);
+      });
+
+      birthdayMelody.addEventListener("pause", () => {
+        if (musicNoteTimer) window.clearInterval(musicNoteTimer);
+        musicNoteTimer = null;
+        updateMusicState(musicPausedByUser ? "paused" : "default");
+      });
+
+      birthdayMelody.addEventListener("error", () => updateMusicState("default"));
+
+      window.addEventListener("load", () => {
+        if (shouldStartMusic) birthdayMelody.play().catch(() => updateMusicState("default"));
+      });
+
+      musicButton.addEventListener("click", () => {
+        if (birthdayMelody.paused) {
+          musicPausedByUser = false;
+          birthdayMelody.play().catch(() => updateMusicState("default"));
+        } else {
+          musicPausedByUser = true;
+          birthdayMelody.pause();
+        }
+      });
+
       function showHoverTooltip(item) {
         if (editing) return;
         const itemRect = item.getBoundingClientRect();
@@ -977,6 +1391,7 @@
       function openNotebook() {
         if (editing) return;
         hideHoverTooltip();
+        setRoomCursorType("heart");
         notebookOverlay.hidden = false;
         notebookOverlay.setAttribute("aria-hidden", "false");
         requestAnimationFrame(() => notebookOverlay.classList.add("is-open"));
@@ -984,6 +1399,7 @@
       }
 
       function closeNotebook() {
+        setRoomCursorType("sparkle");
         notebookOverlay.classList.remove("is-open");
         notebookOverlay.setAttribute("aria-hidden", "true");
         window.setTimeout(() => { notebookOverlay.hidden = true; }, 240);
@@ -1012,6 +1428,23 @@
         if (cakeStage.classList.contains("is-blown")) return;
         cakeStage.classList.add("is-blown");
         window.setTimeout(() => cakeCelebration.classList.add("is-finished"), 700);
+      }
+
+      function celebrateCharacter(item, headline, subtext) {
+        if (editing) return;
+        item.classList.remove("is-celebrating");
+        void item.offsetWidth;
+        item.classList.add("is-celebrating");
+        const itemRect = item.getBoundingClientRect();
+        const feedback = document.createElement("div");
+        feedback.className = "character-feedback";
+        feedback.style.left = `${itemRect.left + itemRect.width / 2}px`;
+        feedback.style.top = `${itemRect.top}px`;
+        feedback.innerHTML = `<span class="character-feedback-main"></span><span class="character-feedback-sub"></span><span class="feedback-particle feedback-particle--one">✦</span><span class="feedback-particle feedback-particle--two">♥</span><span class="feedback-particle feedback-particle--three">♥</span><span class="feedback-particle feedback-particle--four">✦</span>`;
+        feedback.querySelector(".character-feedback-main").textContent = headline;
+        feedback.querySelector(".character-feedback-sub").textContent = subtext;
+        feedback.addEventListener("animationend", () => feedback.remove());
+        document.body.append(feedback);
       }
 
       function saveMessages() {
@@ -1255,6 +1688,17 @@
           event.preventDefault();
           blowCakeCandle();
         }
+      });
+      mimiItem.addEventListener("click", () => celebrateCharacter(mimiItem, "🎉 +1", "Happy birthday ✨"));
+      dogItem.addEventListener("click", () => celebrateCharacter(dogItem, "🐾 +1", "汪！过生日 🐶"));
+      [mimiItem, dogItem].forEach((item) => {
+        item.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            if (item === mimiItem) celebrateCharacter(mimiItem, "🎉 +1", "Happy birthday ✨");
+            if (item === dogItem) celebrateCharacter(dogItem, "🐾 +1", "汪！过生日 🐶");
+          }
+        });
       });
       messageForm.addEventListener("submit", (event) => {
         event.preventDefault();

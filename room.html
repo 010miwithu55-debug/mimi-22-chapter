@@ -16,13 +16,100 @@
         display: block;
         height: auto;
         user-select: none;
+        pointer-events: auto;
+        transition: transform 180ms ease;
+      }
+
+      .room-screen:not(.is-editing) .mimi:hover,
+      .room-screen:not(.is-editing) .dog:hover,
+      .room-screen:not(.is-editing) .cake:hover { transform: scale(1.07); }
+
+      .room-screen:not(.is-editing) .camera:hover { transform: rotate(-6deg) scale(1.07); }
+      .room-screen:not(.is-editing) .notebook:hover { transform: rotate(7deg) scale(1.07); }
+
+      .hover-tooltip {
+        position: fixed;
+        z-index: 20;
+        max-width: min(15rem, 78vw);
+        padding: 0.55rem 0.75rem;
+        color: #8d4263;
+        font: 700 0.9rem/1.35 "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        text-align: center;
+        background: #fff6fa;
+        border: 2px dashed #de91b0;
+        border-radius: 10px 13px 9px 12px;
+        box-shadow: 3px 4px 0 rgb(181 79 123 / 20%);
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, calc(-100% - 12px)) scale(0.82) rotate(-1.5deg);
+        transition: opacity 150ms ease, transform 180ms ease;
+      }
+
+      .hover-tooltip.is-visible {
+        opacity: 1;
+        transform: translate(-50%, calc(-100% - 12px)) scale(1) rotate(-1.5deg);
+      }
+
+      .mimi-character {
+        aspect-ratio: 362 / 454;
+      }
+
+      .mimi-character img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
         pointer-events: none;
       }
+
+      .mimi-character .mimi-close {
+        opacity: 0;
+        animation: mimi-blink 5s steps(1, end) infinite;
+      }
+
+      .mimi-character .mimi-open {
+        animation: mimi-open 5s steps(1, end) infinite;
+      }
+
+      .dog-character {
+        aspect-ratio: 812 / 726;
+      }
+
+      .dog-character img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center bottom;
+        pointer-events: none;
+      }
+
+      .dog-character .dog-close { opacity: 0; }
+      .dog-character.is-blinking .dog-open { opacity: 0; }
+      .dog-character.is-blinking .dog-close { opacity: 1; }
 
       .edit-toggle {
         position: fixed;
         top: 2%;
         right: 2%;
+        z-index: 10;
+        padding: 0.65em 0.9em;
+        color: #8d4263;
+        font: 700 0.95rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        background: #fff4f8;
+        border: 1px solid #e8a1bd;
+        border-radius: 8px 11px 7px 10px;
+        box-shadow: 2px 3px 0 rgb(163 74 112 / 22%);
+        cursor: pointer;
+      }
+
+      .save-layout {
+        position: fixed;
+        top: 2%;
+        right: 12%;
         z-index: 10;
         padding: 0.65em 0.9em;
         color: #8d4263;
@@ -77,30 +164,79 @@
         opacity: 1;
         transform: rotate(7deg);
       }
+
+      @keyframes mimi-blink {
+        0%, 93%, 97%, 100% { opacity: 0; }
+        94%, 96% { opacity: 1; }
+      }
+
+      @keyframes mimi-open {
+        0%, 93%, 97%, 100% { opacity: 1; }
+        94%, 96% { opacity: 0; }
+      }
     </style>
   </head>
   <body>
     <main class="screen room-screen" aria-label="Mimi's birthday room">
-      <img class="room-item mimi" data-editable src="assets/characters/mimi-open.png" alt="Mimi" draggable="false" />
-      <img class="room-item dog" data-editable src="assets/objects/dog.png" alt="A small dog" draggable="false" />
-      <img class="room-item cake" data-editable src="assets/objects/cake.png" alt="Birthday cake" draggable="false" />
-      <img class="room-item notebook" id="notebook" data-editable src="assets/objects/notebook.png" alt="Pink notebook" draggable="false" />
-      <img class="room-item camera" data-editable src="assets/objects/camera.png" alt="Pink camera" draggable="false" />
+      <div class="room-item mimi mimi-character" data-editable data-layout-key="mimi" data-tooltip="今天是特别的日子🥳🎉" aria-label="Mimi">
+        <img class="mimi-open" src="assets/characters/mimi-open.png" alt="" draggable="false" />
+        <img class="mimi-close" src="assets/characters/mimi-close.png" alt="" draggable="false" />
+      </div>
+      <div class="room-item dog dog-character" data-editable data-layout-key="dog" data-tooltip="汪汪！🐶" aria-label="A small dog">
+        <img class="dog-open" src="assets/objects/dog-open.png" alt="" draggable="false" />
+        <img class="dog-close" src="assets/objects/dog-close.png" alt="" draggable="false" />
+      </div>
+      <img class="room-item cake" data-editable data-layout-key="cake" data-tooltip="一起吹灭蜡烛吧 🎂" src="assets/objects/cake.png" alt="Birthday cake" draggable="false" />
+      <img class="room-item notebook" id="notebook" data-editable data-layout-key="notebook" data-tooltip="谢谢你来到我的22岁💌" src="assets/objects/notebook.png" alt="Pink notebook" draggable="false" />
+      <img class="room-item camera" data-editable data-layout-key="camera" data-tooltip="打开我的回忆铁盒 📷" src="assets/objects/camera.png" alt="Pink camera" draggable="false" />
     </main>
     <button class="edit-toggle" id="edit-toggle" type="button" aria-pressed="false">Edit room</button>
+    <button class="save-layout" id="save-layout" type="button">Save layout</button>
     <aside class="editor-readout" id="editor-readout" hidden aria-live="polite"></aside>
+    <aside class="hover-tooltip" id="hover-tooltip" role="status" aria-live="polite"></aside>
 
     <script>
       const roomStage = document.querySelector(".room-screen");
       const roomItems = [...document.querySelectorAll("[data-editable]")];
       const editToggle = document.querySelector("#edit-toggle");
+      const saveLayout = document.querySelector("#save-layout");
       const readout = document.querySelector("#editor-readout");
+      const hoverTooltip = document.querySelector("#hover-tooltip");
+      const dogCharacter = document.querySelector(".dog-character");
+      const layoutStorageKey = "mimi-22-room-layout";
       let editing = false;
       let dragState = null;
+      let isNormalized = false;
 
       const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
       const usesLayoutMetrics = (item) => item.classList.contains("camera") || item.classList.contains("notebook");
       const fallbackWidth = (item) => item.classList.contains("camera") ? 5 : 6;
+
+      function scheduleDogBlink() {
+        const delay = 3000 + Math.random() * 3000;
+        window.setTimeout(() => {
+          dogCharacter.classList.add("is-blinking");
+          window.setTimeout(() => {
+            dogCharacter.classList.remove("is-blinking");
+            scheduleDogBlink();
+          }, 200);
+        }, delay);
+      }
+
+      scheduleDogBlink();
+
+      function showHoverTooltip(item) {
+        if (editing) return;
+        const itemRect = item.getBoundingClientRect();
+        hoverTooltip.textContent = item.dataset.tooltip;
+        hoverTooltip.style.left = `${itemRect.left + itemRect.width / 2}px`;
+        hoverTooltip.style.top = `${itemRect.top}px`;
+        hoverTooltip.classList.add("is-visible");
+      }
+
+      function hideHoverTooltip() {
+        hoverTooltip.classList.remove("is-visible");
+      }
 
       function getParameters(item) {
         const stageRect = roomStage.getBoundingClientRect();
@@ -135,22 +271,71 @@
         applyParameters(item, getParameters(item));
       }
 
+      function captureLayout() {
+        return Object.fromEntries(roomItems.map((item) => {
+          const parameters = getParameters(item);
+          return [item.dataset.layoutKey, {
+            left: parameters.left,
+            top: parameters.top,
+            width: parameters.width,
+            height: parameters.height,
+          }];
+        }));
+      }
+
+      function applyLayout(layout) {
+        roomItems.forEach((item) => {
+          const parameters = layout[item.dataset.layoutKey];
+          if (!parameters || ![parameters.left, parameters.top, parameters.width].every(Number.isFinite)) return;
+          applyParameters(item, parameters);
+        });
+        isNormalized = true;
+      }
+
+      function showSavedLayout(layout) {
+        const output = Object.fromEntries(Object.entries(layout).map(([name, parameters]) => [name, {
+          left: `${parameters.left.toFixed(2)}%`,
+          top: `${parameters.top.toFixed(2)}%`,
+          width: `${parameters.width.toFixed(2)}%`,
+          height: `${parameters.height.toFixed(2)}%`,
+        }]));
+        readout.textContent = `Saved layout:\n${JSON.stringify(output, null, 2)}`;
+        readout.hidden = false;
+      }
+
       function setEditing(nextEditing) {
         editing = nextEditing;
         roomStage.classList.toggle("is-editing", editing);
+        hideHoverTooltip();
         editToggle.textContent = editing ? "Finish editing" : "Edit room";
         editToggle.setAttribute("aria-pressed", String(editing));
         readout.hidden = !editing;
 
         if (editing) {
-          roomItems.forEach(normalizeItem);
+          if (!isNormalized) {
+            roomItems.forEach(normalizeItem);
+            isNormalized = true;
+          }
           showParameters(roomItems[0]);
         }
       }
 
       editToggle.addEventListener("click", () => setEditing(!editing));
 
+      saveLayout.addEventListener("click", () => {
+        if (!isNormalized) {
+          roomItems.forEach(normalizeItem);
+          isNormalized = true;
+        }
+        const layout = captureLayout();
+        localStorage.setItem(layoutStorageKey, JSON.stringify(layout));
+        showSavedLayout(layout);
+      });
+
       roomItems.forEach((item) => {
+        item.addEventListener("pointerenter", () => showHoverTooltip(item));
+        item.addEventListener("pointerleave", hideHoverTooltip);
+
         item.addEventListener("pointerdown", (event) => {
           if (!editing) return;
           const itemRect = item.getBoundingClientRect();
@@ -196,6 +381,15 @@
         applyParameters(item, { left: parameters.left, top: parameters.top, width });
         showParameters(item);
       }, { passive: false });
+
+      window.addEventListener("load", () => {
+        try {
+          const savedLayout = JSON.parse(localStorage.getItem(layoutStorageKey));
+          if (savedLayout) applyLayout(savedLayout);
+        } catch {
+          localStorage.removeItem(layoutStorageKey);
+        }
+      });
     </script>
   </body>
 </html>

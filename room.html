@@ -99,15 +99,23 @@
       let dragState = null;
 
       const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
+      const usesLayoutMetrics = (item) => item.classList.contains("camera") || item.classList.contains("notebook");
+      const fallbackWidth = (item) => item.classList.contains("camera") ? 5 : 6;
 
       function getParameters(item) {
         const stageRect = roomStage.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
+        const useLayoutSize = usesLayoutMetrics(item);
+        const widthPixels = useLayoutSize ? item.offsetWidth : itemRect.width;
+        const heightPixels = useLayoutSize ? item.offsetHeight : itemRect.height;
+        const leftPixels = useLayoutSize ? item.offsetLeft : itemRect.left - stageRect.left;
+        const topPixels = useLayoutSize ? item.offsetTop : itemRect.top - stageRect.top;
         return {
-          left: ((itemRect.left - stageRect.left) / stageRect.width) * 100,
-          top: ((itemRect.top - stageRect.top) / stageRect.height) * 100,
-          width: (itemRect.width / stageRect.width) * 100,
-          widthPixels: itemRect.width,
+          left: (leftPixels / stageRect.width) * 100,
+          top: (topPixels / stageRect.height) * 100,
+          width: (widthPixels / stageRect.width) * 100,
+          height: (heightPixels / stageRect.height) * 100,
+          widthPixels,
         };
       }
 
@@ -156,8 +164,12 @@
           if (!dragState || dragState.item !== item) return;
           const stageRect = roomStage.getBoundingClientRect();
           const itemRect = item.getBoundingClientRect();
-          const width = (itemRect.width / stageRect.width) * 100;
-          const height = (itemRect.height / stageRect.height) * 100;
+          const width = usesLayoutMetrics(item)
+            ? (item.offsetWidth / stageRect.width) * 100
+            : (itemRect.width / stageRect.width) * 100;
+          const height = usesLayoutMetrics(item)
+            ? (item.offsetHeight / stageRect.height) * 100
+            : (itemRect.height / stageRect.height) * 100;
           const left = clamp(((event.clientX - stageRect.left - dragState.offsetX) / stageRect.width) * 100, 0, 100 - width);
           const top = clamp(((event.clientY - stageRect.top - dragState.offsetY) / stageRect.height) * 100, 0, 100 - height);
           applyParameters(item, { left, top, width });
@@ -177,7 +189,10 @@
         event.preventDefault();
         const parameters = getParameters(item);
         const scale = event.deltaY < 0 ? 1.1 : 0.9;
-        const width = clamp(parameters.width * scale, 3, 30);
+        const baseWidth = Number.isFinite(parameters.width) && parameters.width > 0
+          ? parameters.width
+          : fallbackWidth(item);
+        const width = clamp(baseWidth * scale, 3, 30);
         applyParameters(item, { left: parameters.left, top: parameters.top, width });
         showParameters(item);
       }, { passive: false });

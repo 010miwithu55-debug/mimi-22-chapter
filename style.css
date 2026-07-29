@@ -1,0 +1,143 @@
+:root {
+  color: #5d4052;
+  background: #f8dce6;
+  font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 320px; }
+
+.screen {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.welcome-screen {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2.5rem;
+  padding: 2rem;
+  background-image: url("assets/backgrounds/welcome.png");
+  opacity: 0;
+  animation: background-appear 1.3s ease-out forwards;
+}
+
+.title-area {
+  position: relative;
+  z-index: 1;
+  max-width: min(80vw, 720px);
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.76) rotate(-4deg);
+  animation: title-stick 0.95s cubic-bezier(.18, .9, .22, 1.24) 0.75s forwards;
+}
+
+.collage-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.07em;
+  margin: 0;
+  color: #a93d6e;
+  font-family: "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: clamp(2.35rem, 7.3vw, 6rem);
+  font-weight: 800;
+  line-height: 0.98;
+  text-shadow: 1px 2px 0 rgb(255 255 255 / 75%);
+}
+
+.collage-line--small {
+  margin-bottom: 0.22em;
+  font-size: clamp(1.7rem, 4.6vw, 3.7rem);
+}
+
+.collage-line--chapter {
+  flex-wrap: nowrap;
+  font-size: clamp(2rem, 6.5vw, 5.2rem);
+}
+
+.collage-line span,
+.collage-line b,
+.collage-line em,
+.collage-line i {
+  display: inline-block;
+  padding: 0.04em 0.1em 0.09em;
+  font: inherit;
+  font-style: normal;
+  line-height: 1;
+  background: #fff7bd;
+  border: 2px solid rgb(154 57 104 / 65%);
+  border-radius: 3px 8px 4px 7px;
+  box-shadow: 2px 3px 0 rgb(142 61 101 / 21%);
+  transform: rotate(-3deg);
+}
+
+.collage-line span:nth-child(3n + 2) { background: #b6e5db; color: #31776d; transform: rotate(3deg); }
+.collage-line span:nth-child(4n) { background: #ffc2d7; color: #a13967; transform: rotate(-5deg); }
+.collage-line span:nth-child(5n) { background: #cab9e9; color: #594083; transform: rotate(4deg); }
+.collage-line b { margin-left: -0.09em; background: #ffb8cf; color: #9d2e63; transform: rotate(4deg); }
+.collage-line em { margin: 0 0.1em; padding-inline: 0.14em; background: #f3a4bd; color: #fffdf5; transform: rotate(-5deg); }
+.collage-line i { margin-left: 0.18em; background: #fff; color: #e36e98; transform: rotate(5deg); }
+
+.enter-button {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  padding: 0.82rem 1.5rem 0.76rem;
+  color: #9d3867;
+  font-family: "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffd4e2 0 48%, #ffc0d5 48% 100%);
+  border: 2px solid #cf7094;
+  border-radius: 5px 11px 6px 10px;
+  box-shadow: 4px 5px 0 rgb(166 65 110 / 28%);
+  transform: rotate(1.5deg);
+  opacity: 0;
+  animation: title-appear 0.8s ease-out 1.5s forwards;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.enter-button:hover, .enter-button:focus-visible {
+  transform: rotate(1.5deg) scale(1.06);
+  box-shadow: 5px 6px 0 rgb(166 65 110 / 30%);
+}
+
+.enter-button:active { transform: rotate(1.5deg) scale(0.96); }
+
+.room-screen { background-image: url("assets/backgrounds/room.png"); }
+
+.object-slot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Future interactive object anchors. Adjust when their final placement is decided. */
+.mimi-slot { left: 48%; top: 42%; }
+.dog-slot { left: 31%; top: 68%; }
+.cake-slot { left: 66%; top: 60%; }
+.notebook-slot { left: 57%; top: 70%; }
+.camera-slot { left: 75%; top: 50%; }
+
+@keyframes background-appear { to { opacity: 1; } }
+@keyframes title-appear { to { opacity: 1; } }
+
+@keyframes title-stick {
+  70% { opacity: 1; transform: scale(1.06) rotate(1.5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-1.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-screen, .title-area, .enter-button { animation: none; opacity: 1; }
+}

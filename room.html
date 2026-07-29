@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mimi's 22 Chapter birthday room" />
+    <title>Mimi's 22 Chapter — Room</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .room-screen {
+        isolation: isolate;
+      }
+
+      .room-item {
+        position: absolute;
+        display: block;
+        height: auto;
+        user-select: none;
+        pointer-events: none;
+      }
+
+      .edit-toggle {
+        position: fixed;
+        top: 2%;
+        right: 2%;
+        z-index: 10;
+        padding: 0.65em 0.9em;
+        color: #8d4263;
+        font: 700 0.95rem "Marker Felt", "Bradley Hand", "Comic Sans MS", cursive;
+        background: #fff4f8;
+        border: 1px solid #e8a1bd;
+        border-radius: 8px 11px 7px 10px;
+        box-shadow: 2px 3px 0 rgb(163 74 112 / 22%);
+        cursor: pointer;
+      }
+
+      .editor-readout {
+        position: fixed;
+        bottom: 2%;
+        left: 2%;
+        z-index: 10;
+        min-width: 12rem;
+        margin: 0;
+        padding: 0.8rem 1rem;
+        color: #75445a;
+        font: 0.9rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-line;
+        background: rgb(255 249 251 / 90%);
+        border: 1px dashed #dfa0b8;
+        border-radius: 7px;
+        box-shadow: 2px 3px 0 rgb(163 74 112 / 16%);
+      }
+
+      .room-screen.is-editing [data-editable] {
+        pointer-events: auto;
+        cursor: grab;
+        outline: 1px dashed rgb(183 75 119 / 58%);
+        outline-offset: 3px;
+        touch-action: none;
+      }
+
+      .room-screen.is-editing [data-editable]:hover { outline-color: #bd4d79; }
+      .room-screen.is-editing [data-editable].is-dragging { cursor: grabbing; }
+
+      /* All dimensions and anchors use the room stage's percentage-based coordinate system. */
+      .mimi { width: 9%; left: 30%; bottom: 8%; z-index: 2; }
+      .dog { width: 8%; left: 42%; bottom: 8%; z-index: 3; }
+      .cake { width: 11%; left: 52%; bottom: 15%; z-index: 4; }
+      .camera { width: 5%; left: 15%; bottom: 42%; z-index: 2; transform: rotate(-6deg); }
+      .notebook {
+        display: block;
+        width: 6%;
+        left: 75%;
+        bottom: 30%;
+        z-index: 5;
+        visibility: visible;
+        opacity: 1;
+        transform: rotate(7deg);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="screen room-screen" aria-label="Mimi's birthday room">
+      <img class="room-item mimi" data-editable src="assets/characters/mimi-open.png" alt="Mimi" draggable="false" />
+      <img class="room-item dog" data-editable src="assets/objects/dog.png" alt="A small dog" draggable="false" />
+      <img class="room-item cake" data-editable src="assets/objects/cake.png" alt="Birthday cake" draggable="false" />
+      <img class="room-item notebook" id="notebook" data-editable src="assets/objects/notebook.png" alt="Pink notebook" draggable="false" />
+      <img class="room-item camera" data-editable src="assets/objects/camera.png" alt="Pink camera" draggable="false" />
+    </main>
+    <button class="edit-toggle" id="edit-toggle" type="button" aria-pressed="false">Edit room</button>
+    <aside class="editor-readout" id="editor-readout" hidden aria-live="polite"></aside>
+
+    <script>
+      const roomStage = document.querySelector(".room-screen");
+      const roomItems = [...document.querySelectorAll("[data-editable]")];
+      const editToggle = document.querySelector("#edit-toggle");
+      const readout = document.querySelector("#editor-readout");
+      let editing = false;
+      let dragState = null;
+
+      const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
+
+      function getParameters(item) {
+        const stageRect = roomStage.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        return {
+          left: ((itemRect.left - stageRect.left) / stageRect.width) * 100,
+          top: ((itemRect.top - stageRect.top) / stageRect.height) * 100,
+          width: (itemRect.width / stageRect.width) * 100,
+          widthPixels: itemRect.width,
+        };
+      }
+
+      function applyParameters(item, parameters) {
+        item.style.left = `${parameters.left}%`;
+        item.style.top = `${parameters.top}%`;
+        item.style.bottom = "auto";
+        item.style.width = `${parameters.width}%`;
+      }
+
+      function showParameters(item) {
+        const parameters = getParameters(item);
+        readout.textContent = `${item.classList[1]}:\nleft: ${parameters.left.toFixed(2)}%\ntop: ${parameters.top.toFixed(2)}%\nwidth: ${parameters.widthPixels.toFixed(0)}px (${parameters.width.toFixed(2)}%)`;
+      }
+
+      function normalizeItem(item) {
+        applyParameters(item, getParameters(item));
+      }
+
+      function setEditing(nextEditing) {
+        editing = nextEditing;
+        roomStage.classList.toggle("is-editing", editing);
+        editToggle.textContent = editing ? "Finish editing" : "Edit room";
+        editToggle.setAttribute("aria-pressed", String(editing));
+        readout.hidden = !editing;
+
+        if (editing) {
+          roomItems.forEach(normalizeItem);
+          showParameters(roomItems[0]);
+        }
+      }
+
+      editToggle.addEventListener("click", () => setEditing(!editing));
+
+      roomItems.forEach((item) => {
+        item.addEventListener("pointerdown", (event) => {
+          if (!editing) return;
+          const itemRect = item.getBoundingClientRect();
+          dragState = { item, offsetX: event.clientX - itemRect.left, offsetY: event.clientY - itemRect.top };
+          item.classList.add("is-dragging");
+          item.setPointerCapture(event.pointerId);
+          showParameters(item);
+        });
+
+        item.addEventListener("pointermove", (event) => {
+          if (!dragState || dragState.item !== item) return;
+          const stageRect = roomStage.getBoundingClientRect();
+          const itemRect = item.getBoundingClientRect();
+          const width = (itemRect.width / stageRect.width) * 100;
+          const height = (itemRect.height / stageRect.height) * 100;
+          const left = clamp(((event.clientX - stageRect.left - dragState.offsetX) / stageRect.width) * 100, 0, 100 - width);
+          const top = clamp(((event.clientY - stageRect.top - dragState.offsetY) / stageRect.height) * 100, 0, 100 - height);
+          applyParameters(item, { left, top, width });
+          showParameters(item);
+        });
+
+        item.addEventListener("pointerup", () => {
+          item.classList.remove("is-dragging");
+          dragState = null;
+        });
+      });
+
+      roomStage.addEventListener("wheel", (event) => {
+        if (!editing) return;
+        const item = event.target.closest(".room-item");
+        if (!item) return;
+        event.preventDefault();
+        const parameters = getParameters(item);
+        const scale = event.deltaY < 0 ? 1.1 : 0.9;
+        const width = clamp(parameters.width * scale, 3, 30);
+        applyParameters(item, { left: parameters.left, top: parameters.top, width });
+        showParameters(item);
+      }, { passive: false });
+    </script>
+  </body>
+</html>

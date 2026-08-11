@@ -7,7 +7,22 @@
     <title>Mimi's 22 Chapter</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <body class="intro-active">
+    <section class="chapter-intro" id="chapter-intro" role="button" tabindex="0" aria-label="Open Mimi's 22 chapter">
+      <div class="chapter-intro__panel chapter-intro__panel--left" aria-hidden="true"></div>
+      <div class="chapter-intro__panel chapter-intro__panel--right" aria-hidden="true"></div>
+      <div class="chapter-intro__content" aria-hidden="true">
+        <p class="chapter-intro__eyebrow">open my</p>
+        <p class="chapter-intro__title">22 chapter</p>
+        <p class="chapter-intro__hint">tap to tear open ♡</p>
+      </div>
+      <span class="chapter-intro__sticker chapter-intro__sticker--star" aria-hidden="true">✦</span>
+      <span class="chapter-intro__sticker chapter-intro__sticker--heart" aria-hidden="true">💗</span>
+      <span class="chapter-intro__mini-icon chapter-intro__mini-icon--cake" aria-hidden="true">🎂</span>
+      <span class="chapter-intro__mini-icon chapter-intro__mini-icon--bow" aria-hidden="true">🎀</span>
+      <span class="chapter-intro__mini-icon chapter-intro__mini-icon--camera" aria-hidden="true">📷</span>
+      <span class="chapter-intro__mini-icon chapter-intro__mini-icon--dog" aria-hidden="true">🐶</span>
+    </section>
     <main>
       <section class="screen welcome-screen" id="welcome-screen" aria-labelledby="welcome-title">
         <div class="cover-bubbles" aria-hidden="true">
@@ -59,9 +74,41 @@
         });
       }
 
-      window.setTimeout(() => {
-        enterButton.classList.add("is-visible");
-      }, 3050);
+      const chapterIntro = document.querySelector("#chapter-intro");
+      const skipIntro = new URLSearchParams(window.location.search).get("skipIntro") === "1";
+      let welcomeHasStarted = false;
+
+      function startWelcomePage() {
+        if (welcomeHasStarted) return;
+        welcomeHasStarted = true;
+        document.body.classList.remove("intro-active");
+        window.setTimeout(() => {
+          enterButton.classList.add("is-visible");
+        }, 3050);
+      }
+
+      function openChapterIntro() {
+        if (chapterIntro.classList.contains("is-opening")) return;
+        chapterIntro.classList.add("is-opening");
+        chapterIntro.setAttribute("aria-hidden", "true");
+        window.setTimeout(() => {
+          chapterIntro.remove();
+          startWelcomePage();
+        }, 1000);
+      }
+
+      if (skipIntro) {
+        chapterIntro.remove();
+        startWelcomePage();
+      } else {
+        chapterIntro.addEventListener("click", openChapterIntro);
+        chapterIntro.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openChapterIntro();
+          }
+        });
+      }
 
       enterButton.addEventListener("click", () => {
         sessionStorage.setItem("mimi-22-play-melody", "1");

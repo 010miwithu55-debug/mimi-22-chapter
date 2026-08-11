@@ -836,6 +836,37 @@
           background-color: #f7dce6;
         }
 
+        .room-screen,
+        .room-screen *,
+        .music-corner,
+        .music-corner *,
+        .memory-overlay,
+        .memory-overlay *,
+        .cake-overlay,
+        .cake-overlay *,
+        .notebook-overlay,
+        .notebook-overlay * {
+          -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+
+        .room-screen img,
+        .memory-overlay img,
+        .cake-overlay img,
+        .notebook-overlay img {
+          -webkit-user-drag: none;
+          user-drag: none;
+        }
+
+        .notebook-overlay input,
+        .notebook-overlay textarea {
+          -webkit-touch-callout: default;
+          -webkit-user-select: text;
+          user-select: text;
+        }
+
         .room-mobile-canvas {
           position: absolute;
           top: 50%;
@@ -857,6 +888,8 @@
           z-index: 3;
           width: min(calc(var(--bubble-size) + var(--bubble-size)), 20vw);
           pointer-events: auto;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
         }
       }
 
@@ -1408,11 +1441,15 @@
         bubble.style.setProperty("--bubble-mid-scale", randomBetween(0.92, 1.08));
         bubble.style.setProperty("--bubble-duration", `${randomBetween(13, 20) / bubbleSpeed}s`);
         bubble.style.setProperty("--bubble-delay", "0s");
-        bubble.addEventListener("click", (event) => {
+        const handleMobileBubblePress = (event) => {
           if (!isMobileRoom()) return;
-          event.stopPropagation();
+          if (event.cancelable) event.preventDefault();
+          event.stopImmediatePropagation();
           popBirthdayBubble(bubble);
-        });
+        };
+        const mobileBubbleStartEvent = window.PointerEvent ? "pointerdown" : "touchstart";
+        bubble.addEventListener(mobileBubbleStartEvent, handleMobileBubblePress, { passive: false });
+        bubble.addEventListener("click", handleMobileBubblePress, { passive: false });
         bubble.addEventListener("animationend", (event) => {
           if (event.target !== bubble || event.animationName !== "bubble-rise") return;
           bubble.remove();
